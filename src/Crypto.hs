@@ -44,7 +44,11 @@ inverse = undefined
 
 -- | Calculates (a^k mod m)
 modPow :: Int -> Int -> Int -> Int
-modPow = undefined
+modPow a k m
+  | even k = (((a^2) `mod` m)^j) `mod` m
+  | otherwise = a * modPow a (k-1) m `mod` m
+  where 
+    j = k `div` 2
 
 -- | Returns the smallest integer that is coprime with phi
 smallestCoPrimeOf :: Int -> Int
