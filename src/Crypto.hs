@@ -36,18 +36,26 @@ Calculates (u, v, d) the gcd (d) and Bezout coefficients (u and v)
 such that au + bv = d
 -}
 computeCoeffs :: Int -> Int -> (Int, Int)
-computeCoeffs = undefined
+computeCoeffs a b
+  | b == 0 = (1, 0)
+  | otherwise = (v, (u - q*v))
+  where
+    (q, r) = quotRem a b
+    (u, v) = computeCoeffs b r
 
 -- | Inverse of a modulo m
 inverse :: Int -> Int -> Int
-inverse = undefined
+inverse a m = u `mod` m
+  where
+    (u,v) = computeCoeffs a m
 
 -- | Calculates (a^k mod m)
 modPow :: Int -> Int -> Int -> Int
 modPow a k m
-  | even k = (((a^2) `mod` m)^j) `mod` m
+  | k == 0 = 1 `mod` m
+  | even k = modPow ((a^2) `mod` m) j m `mod` m
   | otherwise = a * modPow a (k-1) m `mod` m
-  where 
+  where
     j = k `div` 2
 
 -- | Returns the smallest integer that is coprime with phi
@@ -62,38 +70,42 @@ Generates keys pairs (public, private) = ((e, n), (d, n))
 given two "large" distinct primes, p and q
 -}
 genKeys :: Int -> Int -> ((Int, Int), (Int, Int))
-genKeys = undefined
+genKeys p q = ((e, n), (d, n))
+  where
+    n = p * q
+    e = smallestCoPrimeOf ((p-1) * (q-1))
+    d = inverse e ((p-1)*(q-1))
 
 -- | This function performs RSA encryption
 rsaEncrypt :: Int        -- ^ value to encrypt
            -> (Int, Int) -- ^ public key
            -> Int
-rsaEncrypt = undefined
+rsaEncrypt x (e, n) = modPow x e n
 
 -- | This function performs RSA decryption
 rsaDecrypt :: Int        -- ^ value to decrypt
            -> (Int, Int) -- ^ public key
            -> Int
-rsaDecrypt = undefined
+rsaDecrypt c (d, n) = modPow c d n
 
 -------------------------------------------------------------------------------
 -- PART 2 : symmetric encryption
 
 -- | Returns position of a letter in the alphabet
 toInt :: Char -> Int
-toInt = undefined
+toInt a = ord a - 97
 
 -- | Returns the n^th letter
 toChar :: Int -> Char
-toChar = undefined
+toChar a = chr (a + 97)
 
 -- | "adds" two letters
 add :: Char -> Char -> Char
-add = undefined
+add a b = toChar((toInt a + toInt b) `mod` 26)
 
 -- | "subtracts" two letters
 subtract :: Char -> Char -> Char
-subtract = undefined
+subtract a b = toChar((toInt a - toInt b) `mod` 26)
 
 -- the next functions present
 -- 2 modes of operation for block ciphers : ECB and CBC
