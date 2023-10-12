@@ -37,7 +37,7 @@ such that au + bv = d
 -}
 computeCoeffs :: Int -> Int -> (Int, Int)
 computeCoeffs a b
-  | b == 0 = (1, 0)
+  | b == 0    = (1, 0)
   | otherwise = (v, (u - q*v))
   where
     (q, r) = quotRem a b
@@ -47,13 +47,13 @@ computeCoeffs a b
 inverse :: Int -> Int -> Int
 inverse a m = u `mod` m
   where
-    (u,v) = computeCoeffs a m
+    u = fst (computeCoeffs a m)
 
 -- | Calculates (a^k mod m)
 modPow :: Int -> Int -> Int -> Int
 modPow a k m
-  | k == 0 = 1 `mod` m
-  | even k = modPow ((a^2) `mod` m) j m `mod` m
+  | k == 0    = 1 `mod` m
+  | even k    = modPow ((a^2) `mod` m) j m `mod` m
   | otherwise = a * modPow a (k-1) m `mod` m
   where
     j = k `div` 2
@@ -113,22 +113,30 @@ subtract a b = toChar((toInt a - toInt b) `mod` 26)
 
 -- | ecb (electronic codebook) encryption with block size of a letter
 ecbEncrypt :: Char -> [Char] -> [Char]
-ecbEncrypt = undefined
+ecbEncrypt _ []     = []
+ecbEncrypt k (m:ms) = add m k : ecbEncrypt k ms
 
 -- | ecb (electronic codebook) decryption with a block size of a letter
 ecbDecrypt :: Char -> [Char] -> [Char]
-ecbDecrypt = undefined
+ecbDecrypt _ []     = []
+ecbDecrypt k (m:ms) = subtract m k : ecbDecrypt k ms
 
 -- | cbc (cipherblock chaining) encryption with block size of a letter
 cbcEncrypt :: Char   -- ^ public key
            -> Char   -- ^ initialisation vector `iv`
            -> [Char] -- ^ message `m`
            -> [Char]
-cbcEncrypt = undefined
+cbcEncrypt _ _ []     = []
+cbcEncrypt k v (m:ms) = a : cbcEncrypt k a ms
+  where a = add (add v m) k 
+    
 
 -- | cbc (cipherblock chaining) decryption with block size of a letter
 cbcDecrypt :: Char   -- ^ private key
            -> Char   -- ^ initialisation vector `iv`
            -> [Char] -- ^ message `m`
            -> [Char]
-cbcDecrypt = undefined
+cbcDecrypt _ _ []     = []
+cbcDecrypt k v (c:cs) = a : cbcDecrypt k c cs
+  where 
+    a = subtract (subtract c k) v
