@@ -38,7 +38,7 @@ such that au + bv = d
 computeCoeffs :: Int -> Int -> (Int, Int)
 computeCoeffs a b
   | b == 0    = (1, 0)
-  | otherwise = (v, (u - q*v))
+  | otherwise = (v, u - q*v)
   where
     (q, r) = quotRem a b
     (u, v) = computeCoeffs b r
@@ -101,11 +101,11 @@ toChar a = chr (a + 97)
 
 -- | "adds" two letters
 add :: Char -> Char -> Char
-add a b = toChar((toInt a + toInt b) `mod` 26)
+add a b = toChar ((toInt a + toInt b) `mod` 26)
 
 -- | "subtracts" two letters
 subtract :: Char -> Char -> Char
-subtract a b = toChar((toInt a - toInt b) `mod` 26)
+subtract a b = toChar ((toInt a - toInt b) `mod` 26)
 
 -- the next functions present
 -- 2 modes of operation for block ciphers : ECB and CBC
@@ -128,8 +128,8 @@ cbcEncrypt :: Char   -- ^ public key
            -> [Char]
 cbcEncrypt _ _ []     = []
 cbcEncrypt k v (m:ms) = a : cbcEncrypt k a ms
-  where a = add (add v m) k 
-    
+  where a = add (add v m) k
+
 
 -- | cbc (cipherblock chaining) decryption with block size of a letter
 cbcDecrypt :: Char   -- ^ private key
@@ -138,5 +138,5 @@ cbcDecrypt :: Char   -- ^ private key
            -> [Char]
 cbcDecrypt _ _ []     = []
 cbcDecrypt k v (c:cs) = a : cbcDecrypt k c cs
-  where 
+  where
     a = subtract (subtract c k) v
